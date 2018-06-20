@@ -74,7 +74,7 @@
       <a href="http://google.de">News</a>
       <ul>
         <li>
-          <a href="#" data-source="https://jsonplaceholder.typicode.com/users">Dynamic Users</a>
+          <a href="#" data-source="http://jsonplaceholder.typicode.com/users">Dynamic Users</a>
         </li>
         <li>
           <a href="http://google.de">Submenu entry</a>
@@ -109,7 +109,7 @@
               </ul>
             </li>
             <li>
-              <a href="#" data-source="https://jsonplaceholder.typicode.com/posts">Dynamic Postsy</a>
+              <a href="#" data-source="http://jsonplaceholder.typicode.com/posts">Dynamic Postsy</a>
             </li>
           </ul>
         </li>
@@ -171,11 +171,13 @@
 <script src="scripts/slide-menu.js"></script>
 <!-- endbuild -->
 
-<script defer>
-  (function ($) {
-
-    function fetchItems(source) {
-      return $.get(source).then(function (response) {
+<script>
+  function fetchItems(source) {
+      console.log('SOURCE', source);
+      return $.ajax({
+        method: 'GET',
+        url: source
+      }).then(function (response) {
         var ret = [];
         response.forEach(function (item) {
           var a = {};
@@ -191,20 +193,22 @@
       });
     }
 
+  (function ($) {
     $(function() {
 
       var menuLeft = $('#test-menu-left').slideMenu({
         position: 'left',
         submenuLinkAfter: ' >',
         backLinkBefore: '< ',
-        dynamicSourceFetchFunction: fetchItems,
-        dynamicSourceDataAttribute: 'source',
-        dynamicLoadingContent: '<i class="fa fa-cog"></i> Loading...'
+        
       });
 
       var menuRight = $('#test-menu-right').slideMenu({
         submenuLinkAfter: ' ⇒',
-        backLinkBefore: '⇐ '
+        backLinkBefore: '⇐ ',
+        dynamicSourceFetchFunction: fetchItems,
+        dynamicSourceDataAttribute: 'source',
+        dynamicLoadingContent: '<i class="fa fa-cog"></i> Loading...'
       });
 
       if ($(window).width() > 767) {
