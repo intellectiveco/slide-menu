@@ -1,17 +1,20 @@
 // TODO: make this library agnostic
 // TODO: document the events
 
-(function($) {
-  const PLUGIN_NAME = "slideMenu";
+(function ($) {
+  const PLUGIN_NAME = 'slideMenu';
   const DEFAULT_OPTIONS = {
-    position: "right",
+    position: 'right',
     showBackLink: true,
     keycodeOpen: null,
     keycodeClose: 27, //esc
-    submenuLinkBefore: "",
-    submenuLinkAfter: "",
-    backLinkBefore: "",
-    backLinkAfter: ""
+    submenuLinkBefore: '',
+    submenuLinkAfter: '',
+    backLinkBefore: '',
+    backLinkAfter: '',
+    dynamicSourceFetchFunction: null,
+    dynamicSourceDataAttribute: 'source',
+    dynamicLoadingContent: 'Loading...'
   };
 
   class SlideMenu {
@@ -20,9 +23,9 @@
 
       this._menu = options.elem; // the left and right nav menu elements
       // Add wrapper
-      this._menu.find("ul:first").wrap('<div class="slider">'); // wraps div with class slider around every ul that is the first child of its parent
-      this._anchors = this._menu.find("a"); // returns an object with all of the anchors
-      this._slider = this._menu.find(".slider:first"); // returns an object with all of the slider elements that are the first child of its parent
+      this._menu.find('ul:first').wrap('<div class="slider">'); // wraps div with class slider around every ul that is the first child of its parent
+      this._anchors = this._menu.find('a'); // returns an object with all of the anchors
+      this._slider = this._menu.find('.slider:first'); // returns an object with all of the slider elements that are the first child of its parent
 
       this._level = 0;
       this._isOpen = false;
@@ -46,10 +49,6 @@
       if (this._hasMenu) this._setupSubmenus(); //
     }
 
-    fetchMenuItems(selectedMenuItem) {
-      // TODO make ajax call and fetch menu items based on selectedMenuItem
-    }
-
     /**
      * Toggle the menu
      * @param {boolean|null} open
@@ -69,7 +68,7 @@
         offset = 0;
         this._isOpen = true;
       } else {
-        offset = this.options.position === "left" ? "-100%" : "100%";
+        offset = this.options.position === 'left' ? '-100%' : '100%';
         this._isOpen = false;
       }
 
@@ -89,7 +88,7 @@
      * @param {boolean} animate Use CSS transitions
      */
     open(animate = true) {
-      this._lastAction = "open";
+      this._lastAction = 'open';
       this.toggle(true, animate);
     }
 
@@ -98,7 +97,7 @@
      * @param {boolean} animate Use CSS transitions
      */
     close(animate = true) {
-      this._lastAction = "close";
+      this._lastAction = 'close';
       this.toggle(false, animate);
     }
 
@@ -106,7 +105,7 @@
      * Navigate one menu hierarchy back if possible
      */
     back() {
-      this._lastAction = "back";
+      this._lastAction = 'back';
       this._navigate(null, -1);
     }
 
@@ -119,7 +118,7 @@
 
       if (!target.length) return false;
 
-      var parents = target.parents("ul");
+      var parents = target.parents('ul');
       var level = parents.length - 1;
 
       if (level === 0) return false;
@@ -129,9 +128,41 @@
         parents
           .show()
           .first()
-          .addClass("active");
+          .addClass('active');
         this._triggerAnimation(this._slider, -this._level * 100);
       });
+    }
+
+    _isAnchorDynamic(anchor){
+      return anchor.data(this.options.dynamicSourceDataAttribute) !== undefined && this.options.dynamicSourceFetchFunction != null;
+    }
+
+    _fetchDynamicItems(anchor) {
+      // if the clicked anchor has data function attribute, remove loading ul/li
+      if (this._isAnchorDynamic(anchor)) {
+        // do ajax call
+        var $ul = anchor.next('ul');
+        if ($ul.find('.loading').length) {
+          var fetching = this.options.dynamicSourceFetchFunction.call(anchor.data(this.options.dynamicSourceDataAttribute));
+          fetching.then(function(list){
+            list.forEach(function (a) {
+              var $li = $('<li/>');
+              var $a = $('<a/>').attr({
+                href: a.href,
+                title: a.title
+              });
+              if(a[that.options.dynamicSourceDataAttribute]){
+                $a.data(that.options.dynamicSourceDataAttribute, a[that.options.dynamicSourceDataAttribute]);
+              };
+              $li.append($a);
+              $ul.append($li);
+            });
+
+            anchor.removeData(that.options.dynamicSourceDataAttribute);
+            that._update();
+          });
+        }
+      }
     }
 
     /**
@@ -139,43 +170,20 @@
      * @private
      */
     _setupEventHandlers() {
+      var that = this;
       // if there's at least one anchor
       if (this._hasMenu) {
         // bind a click event handler to all of the anchors
         this._anchors.click(event => {
           // if the clicked element is an anchor tag, assign it to the anchor variable
           // else search up through the target element's ancestors for matched anchor tags that are the first child of their parent and assign it to the anchor variable
-          let anchor = $(event.target).is("a")
+          let anchor = $(event.target).is('a')
             ? $(event.target)
-            : $(event.target).parents("a:first");
+            : $(event.target).parents('a:first');
 
+          this._fetchDynamicItems(anchor);
           // call navigate to slide the menu one step right
           this._navigate(anchor);
-          // if the clicked anchor has data function attribute, remove loading ul/li
-          if (anchor.data("function") !== undefined) {
-            // do ajax call
-            var $ul = anchor.next("ul");
-            if ($ul.find(".loading").length) {
-              $.ajax({
-                url: "https://jsonplaceholder.typicode.com/users",
-                context: this,
-                success: function(response) {
-                  // after getting response of ajax call, remove loading li's
-                  $ul.find(".loading").remove("");
-                  // on each retrieved menu item, add new li
-                  response.forEach(function(menuItem) {
-                    $ul.append(
-                      '<li><a href="#" data-function="function">' +
-                        menuItem.id +
-                        "</a></li>"
-                    );
-                  });
-                  anchor.data("function", undefined);
-                  this._update();
-                }
-              });
-            }
-          }
         });
       }
 
@@ -185,7 +193,7 @@
       // console.log('WHAT IS THIS', $(this._menu.add(this._slider)));
       // select both this._menu and this._slider and add an event listener that listens for transitionend event
       $(this._menu.add(this._slider)).on(
-        "transitionend msTransitionEnd",
+        'transitionend msTransitionEnd',
         () => {
           // when the listener events are triggered, set this._isAnimating to false
           this._isAnimating = false;
@@ -210,11 +218,11 @@
         e.preventDefault();
       });
 
-      this._menu.on("sm.back-after", () => {
-        let lastActiveUl = "ul " + ".active ".repeat(this._level + 1);
+      this._menu.on('sm.back-after', () => {
+        let lastActiveUl = 'ul ' + '.active '.repeat(this._level + 1);
         this._menu
           .find(lastActiveUl)
-          .removeClass("active")
+          .removeClass('active')
           .hide();
       });
     }
@@ -225,8 +233,8 @@
      * @private
      */
     _triggerEvent(afterAnimation = false) {
-      let eventName = "sm." + this._lastAction;
-      if (afterAnimation) eventName += "-after";
+      let eventName = 'sm.' + this._lastAction;
+      if (afterAnimation) eventName += '-after';
       this._menu.trigger(eventName);
     }
 
@@ -246,17 +254,17 @@
       let offset = (this._level + dir) * -100;
 
       if (dir > 0) {
-        if (!anchor.next("ul").length) return;
+        if (!anchor.next('ul').length) return;
 
         anchor
-          .next("ul")
-          .addClass("active")
+          .next('ul')
+          .addClass('active')
           .show();
       } else if (this._level === 0) {
         return;
       }
 
-      this._lastAction = dir > 0 ? "forward" : "back";
+      this._lastAction = dir > 0 ? 'forward' : 'back';
       this._level = this._level + dir;
 
       this._triggerAnimation(this._slider, offset);
@@ -271,9 +279,9 @@
     _triggerAnimation(elem, offset) {
       this._triggerEvent();
 
-      if (!String(offset).includes("%")) offset += "%";
+      if (!String(offset).includes('%')) offset += '%';
 
-      elem.css("transform", "translateX(" + offset + ")");
+      elem.css('transform', 'translateX(' + offset + ')');
       this._isAnimating = true;
     }
 
@@ -284,16 +292,16 @@
     _setupMenu() {
       this._pauseAnimations(() => {
         switch (this.options.position) {
-          case "left":
+          case 'left':
             this._menu.css({
               left: 0,
-              right: "auto",
-              transform: "translateX(-100%)"
+              right: 'auto',
+              transform: 'translateX(-100%)'
             });
             break;
           default:
             this._menu.css({
-              left: "auto",
+              left: 'auto',
               right: 0
             });
             break;
@@ -308,10 +316,20 @@
      * @private
      */
     _pauseAnimations(work) {
-      this._menu.addClass("no-transition");
+      this._menu.addClass('no-transition');
       work();
       this._menu[0].offsetHeight; // trigger a reflow, flushing the CSS changes
-      this._menu.removeClass("no-transition");
+      this._menu.removeClass('no-transition');
+    }
+
+    _processDynamicAnchor(anchor){
+      if (this._isAnchorDynamic(anchor)) {
+        // add sibling ul with child loading li
+        //let's make the ul to store dynamic links
+        var $ul = $('<ul/>');
+        $ul.append($('<li/>').addClass('loading').html(this.options.dynamicLoadingContent));
+        anchor.after($ul);
+      }
     }
 
     /**
@@ -326,17 +344,15 @@
         // anchor click bind event handler
         // inject ul
         // if anchor has data-processed attribute set to false, set it to true
-        if (anchor.data("processed") === undefined) {
-          anchor.data("processed", true);
-          if (anchor.data("function") !== undefined) {
-            // add sibling ul with child loading li
-            anchor.after($('<ul><li class="loading">loading</li></ul>'));
-          }
+        if (anchor.data('processed') === undefined) {
+
+          //process the anchor to see if it has dynamic source for its submenu
+          this._processDynamicAnchor(anchor);
 
           // check if there's a ul sibling next to anchor
-          if (anchor.next("ul").length) {
+          if (anchor.next('ul').length) {
             // prevent default behaviour (use link just to navigate)
-            anchor.click(function(ev) {
+            anchor.click(function (ev) {
               ev.preventDefault();
             });
 
@@ -344,31 +360,33 @@
             let anchorTitle = anchor.text();
             anchor.html(
               this.options.submenuLinkBefore +
-                anchorTitle +
-                this.options.submenuLinkAfter
+              anchorTitle +
+              this.options.submenuLinkAfter
             );
 
             // add a back button
             if (this.options.showBackLink) {
               let backLink = $(
                 '<a href class="slide-menu-control" data-action="back">' +
-                  anchorTitle +
-                  "</a>"
+                anchorTitle +
+                '</a>'
               );
               backLink.html(
                 this.options.backLinkBefore +
-                  backLink.text() +
-                  this.options.backLinkAfter
+                backLink.text() +
+                this.options.backLinkAfter
               );
-              anchor.next("ul").prepend($("<li>").append(backLink));
+              anchor.next('ul').prepend($('<li>').append(backLink));
             }
           }
+          //mark this anchor as processed so it doesn't get set again on update
+          anchor.data('processed', true);
         }
       });
     }
 
     _update() {
-      this._anchors = this._menu.find("a");
+      this._anchors = this._menu.find('a');
       this._hasMenu = this._anchors.length > 0;
       this._setupEventHandlers();
       this._setupSubmenus();
@@ -376,22 +394,22 @@
   }
 
   // Link control buttons with the API
-  $("body").on("click", ".slide-menu-control", function(e) {
+  $('body').on('click', '.slide-menu-control', function (e) {
     let menu;
-    let target = $(this).data("target");
+    let target = $(this).data('target');
 
-    if (!target || target === "this") {
-      menu = $(this).parents(".slide-menu:first");
+    if (!target || target === 'this') {
+      menu = $(this).parents('.slide-menu:first');
     } else {
-      menu = $("#" + target);
+      menu = $('#' + target);
     }
 
     if (!menu.length) return;
 
     let instance = menu.data(PLUGIN_NAME);
-    let action = $(this).data("action");
+    let action = $(this).data('action');
 
-    if (instance && typeof instance[action] === "function") {
+    if (instance && typeof instance[action] === 'function') {
       instance[action]();
     }
 
@@ -399,10 +417,10 @@
   });
 
   // Register the jQuery plugin
-  $.fn[PLUGIN_NAME] = function(options) {
+  $.fn[PLUGIN_NAME] = function (options) {
     if (!$(this).length) {
       console.warn(
-        "Slide Menu: Unable to find menu DOM element. Maybe a typo?"
+        'Slide Menu: Unable to find menu DOM element. Maybe a typo?'
       );
       return;
     }
