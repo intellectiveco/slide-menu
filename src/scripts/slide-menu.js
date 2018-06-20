@@ -20,6 +20,7 @@
   class SlideMenu {
     constructor(options) {
       this.options = options;
+      console.log('OPTIONS', options);
 
       this._menu = options.elem; // the left and right nav menu elements
       // Add wrapper
@@ -139,25 +140,29 @@
 
     _fetchDynamicItems(anchor) {
       // if the clicked anchor has data function attribute, remove loading ul/li
+      // debugger;
+      var that = this;
+      console.log('OPTIONS INSIDE', this.options);
       if (this._isAnchorDynamic(anchor)) {
         // do ajax call
         var $ul = anchor.next('ul');
         if ($ul.find('.loading').length) {
-          var fetching = this.options.dynamicSourceFetchFunction.call(anchor.data(this.options.dynamicSourceDataAttribute));
+          
+          var fetching = this.options.dynamicSourceFetchFunction.call(this, anchor.data(this.options.dynamicSourceDataAttribute));
           fetching.then(function(list){
             list.forEach(function (a) {
               var $li = $('<li/>');
               var $a = $('<a/>').attr({
                 href: a.href,
                 title: a.title
-              });
+              }).text(a.title);
               if(a[that.options.dynamicSourceDataAttribute]){
                 $a.data(that.options.dynamicSourceDataAttribute, a[that.options.dynamicSourceDataAttribute]);
               };
               $li.append($a);
               $ul.append($li);
             });
-
+            $ul.find('.loading').remove();
             anchor.removeData(that.options.dynamicSourceDataAttribute);
             that._update();
           });
