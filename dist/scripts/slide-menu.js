@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -8,16 +8,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 // TODO: document the events
 
 (function ($) {
-  var PLUGIN_NAME = "slideMenu";
+  var PLUGIN_NAME = 'slideMenu';
   var DEFAULT_OPTIONS = {
-    position: "right",
+    position: 'right',
     showBackLink: true,
     keycodeOpen: null,
     keycodeClose: 27, //esc
-    submenuLinkBefore: "",
-    submenuLinkAfter: "",
-    backLinkBefore: "",
-    backLinkAfter: ""
+    submenuLinkBefore: '',
+    submenuLinkAfter: '',
+    backLinkBefore: '',
+    backLinkAfter: ''
   };
 
   var SlideMenu = function () {
@@ -28,9 +28,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       this._menu = options.elem; // the left and right nav menu elements
       // Add wrapper
-      this._menu.find("ul:first").wrap('<div class="slider">'); // wraps div with class slider around every ul that is the first child of its parent
-      this._anchors = this._menu.find("a"); // returns an object with all of the anchors
-      this._slider = this._menu.find(".slider:first"); // returns an object with all of the slider elements that are the first child of its parent
+      this._menu.find('ul:first').wrap('<div class="slider">'); // wraps div with class slider around every ul that is the first child of its parent
+      this._anchors = this._menu.find('a'); // returns an object with all of the anchors
+      this._slider = this._menu.find('.slider:first'); // returns an object with all of the slider elements that are the first child of its parent
 
       this._level = 0;
       this._isOpen = false;
@@ -55,7 +55,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }
 
     _createClass(SlideMenu, [{
-      key: "fetchMenuItems",
+      key: 'fetchMenuItems',
       value: function fetchMenuItems(selectedMenuItem) {}
       // TODO make ajax call and fetch menu items based on selectedMenuItem
 
@@ -67,7 +67,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "toggle",
+      key: 'toggle',
       value: function toggle() {
         var open = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
         var animate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -85,7 +85,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           offset = 0;
           this._isOpen = true;
         } else {
-          offset = this.options.position === "left" ? "-100%" : "100%";
+          offset = this.options.position === 'left' ? '-100%' : '100%';
           this._isOpen = false;
         }
 
@@ -103,11 +103,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "open",
+      key: 'open',
       value: function open() {
         var animate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-        this._lastAction = "open";
+        this._lastAction = 'open';
         this.toggle(true, animate);
       }
 
@@ -117,11 +117,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "close",
+      key: 'close',
       value: function close() {
         var animate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-        this._lastAction = "close";
+        this._lastAction = 'close';
         this.toggle(false, animate);
       }
 
@@ -130,9 +130,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "back",
+      key: 'back',
       value: function back() {
-        this._lastAction = "back";
+        this._lastAction = 'back';
         this._navigate(null, -1);
       }
 
@@ -142,7 +142,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "navigateTo",
+      key: 'navigateTo',
       value: function navigateTo(target) {
         var _this = this;
 
@@ -150,14 +150,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         if (!target.length) return false;
 
-        var parents = target.parents("ul");
+        var parents = target.parents('ul');
         var level = parents.length - 1;
 
         if (level === 0) return false;
 
         this._pauseAnimations(function () {
           _this._level = level;
-          parents.show().first().addClass("active");
+          parents.show().first().addClass('active');
           _this._triggerAnimation(_this._slider, -_this._level * 100);
         });
       }
@@ -168,7 +168,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "_setupEventHandlers",
+      key: '_setupEventHandlers',
       value: function _setupEventHandlers() {
         var _this2 = this;
 
@@ -178,26 +178,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this._anchors.click(function (event) {
             // if the clicked element is an anchor tag, assign it to the anchor variable
             // else search up through the target element's ancestors for matched anchor tags that are the first child of their parent and assign it to the anchor variable
-            var anchor = $(event.target).is("a") ? $(event.target) : $(event.target).parents("a:first");
+            var anchor = $(event.target).is('a') ? $(event.target) : $(event.target).parents('a:first');
 
             // call navigate to slide the menu one step right
             _this2._navigate(anchor);
             // if the clicked anchor has data function attribute, remove loading ul/li
-            if (anchor.data("function") !== undefined) {
+            if (anchor.data('function') !== undefined) {
               // do ajax call
-              var $ul = anchor.next("ul");
-              if ($ul.find(".loading").length) {
+              var $ul = anchor.next('ul');
+              if ($ul.find('.loading').length) {
                 $.ajax({
-                  url: "https://jsonplaceholder.typicode.com/users",
+                  url: 'https://jsonplaceholder.typicode.com/users',
                   context: _this2,
                   success: function success(response) {
                     // after getting response of ajax call, remove loading li's
-                    $ul.find(".loading").remove("");
+                    $ul.find('.loading').remove('');
                     // on each retrieved menu item, add new li
                     response.forEach(function (menuItem) {
-                      $ul.append('<li><a href="#" data-function="function">' + menuItem.id + "</a></li>");
+                      $ul.append('<li><a href="#" data-function="function">' + menuItem.id + '</a></li>');
                     });
-                    anchor.data("function", undefined);
+                    anchor.data('function', undefined);
                     this._update();
                   }
                 });
@@ -211,7 +211,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         // console.log('WHAT IS MENU', this._menu);
         // console.log('WHAT IS THIS', $(this._menu.add(this._slider)));
         // select both this._menu and this._slider and add an event listener that listens for transitionend event
-        $(this._menu.add(this._slider)).on("transitionend msTransitionEnd", function () {
+        $(this._menu.add(this._slider)).on('transitionend msTransitionEnd', function () {
           // when the listener events are triggered, set this._isAnimating to false
           _this2._isAnimating = false;
           //
@@ -234,9 +234,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           e.preventDefault();
         });
 
-        this._menu.on("sm.back-after", function () {
-          var lastActiveUl = "ul " + ".active ".repeat(_this2._level + 1);
-          _this2._menu.find(lastActiveUl).removeClass("active").hide();
+        this._menu.on('sm.back-after', function () {
+          var lastActiveUl = 'ul ' + '.active '.repeat(_this2._level + 1);
+          _this2._menu.find(lastActiveUl).removeClass('active').hide();
         });
       }
 
@@ -247,12 +247,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "_triggerEvent",
+      key: '_triggerEvent',
       value: function _triggerEvent() {
         var afterAnimation = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-        var eventName = "sm." + this._lastAction;
-        if (afterAnimation) eventName += "-after";
+        var eventName = 'sm.' + this._lastAction;
+        if (afterAnimation) eventName += '-after';
         this._menu.trigger(eventName);
       }
 
@@ -264,7 +264,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "_navigate",
+      key: '_navigate',
       value: function _navigate(anchor) {
         var dir = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
@@ -277,14 +277,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var offset = (this._level + dir) * -100;
 
         if (dir > 0) {
-          if (!anchor.next("ul").length) return;
+          if (!anchor.next('ul').length) return;
 
-          anchor.next("ul").addClass("active").show();
+          anchor.next('ul').addClass('active').show();
         } else if (this._level === 0) {
           return;
         }
 
-        this._lastAction = dir > 0 ? "forward" : "back";
+        this._lastAction = dir > 0 ? 'forward' : 'back';
         this._level = this._level + dir;
 
         this._triggerAnimation(this._slider, offset);
@@ -298,13 +298,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "_triggerAnimation",
+      key: '_triggerAnimation',
       value: function _triggerAnimation(elem, offset) {
         this._triggerEvent();
 
-        if (!(String(offset).indexOf("%") !== -1)) offset += "%";
+        if (!(String(offset).indexOf('%') !== -1)) offset += '%';
 
-        elem.css("transform", "translateX(" + offset + ")");
+        elem.css('transform', 'translateX(' + offset + ')');
         this._isAnimating = true;
       }
 
@@ -314,22 +314,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "_setupMenu",
+      key: '_setupMenu',
       value: function _setupMenu() {
         var _this3 = this;
 
         this._pauseAnimations(function () {
           switch (_this3.options.position) {
-            case "left":
+            case 'left':
               _this3._menu.css({
                 left: 0,
-                right: "auto",
-                transform: "translateX(-100%)"
+                right: 'auto',
+                transform: 'translateX(-100%)'
               });
               break;
             default:
               _this3._menu.css({
-                left: "auto",
+                left: 'auto',
                 right: 0
               });
               break;
@@ -345,12 +345,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "_pauseAnimations",
+      key: '_pauseAnimations',
       value: function _pauseAnimations(work) {
-        this._menu.addClass("no-transition");
+        this._menu.addClass('no-transition');
         work();
         this._menu[0].offsetHeight; // trigger a reflow, flushing the CSS changes
-        this._menu.removeClass("no-transition");
+        this._menu.removeClass('no-transition');
       }
 
       /**
@@ -359,7 +359,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: "_setupSubmenus",
+      key: '_setupSubmenus',
       value: function _setupSubmenus() {
         var _this4 = this;
 
@@ -370,15 +370,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           // anchor click bind event handler
           // inject ul
           // if anchor has data-processed attribute set to false, set it to true
-          if (anchor.data("processed") === undefined) {
-            anchor.data("processed", true);
-            if (anchor.data("function") !== undefined) {
+          if (anchor.data('processed') === undefined) {
+            anchor.data('processed', true);
+            if (anchor.data('function') !== undefined) {
               // add sibling ul with child loading li
               anchor.after($('<ul><li class="loading">loading</li></ul>'));
             }
 
             // check if there's a ul sibling next to anchor
-            if (anchor.next("ul").length) {
+            if (anchor.next('ul').length) {
               // prevent default behaviour (use link just to navigate)
               anchor.click(function (ev) {
                 ev.preventDefault();
@@ -390,18 +390,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
               // add a back button
               if (_this4.options.showBackLink) {
-                var backLink = $('<a href class="slide-menu-control" data-action="back">' + anchorTitle + "</a>");
+                var backLink = $('<a href class="slide-menu-control" data-action="back">' + anchorTitle + '</a>');
                 backLink.html(_this4.options.backLinkBefore + backLink.text() + _this4.options.backLinkAfter);
-                anchor.next("ul").prepend($("<li>").append(backLink));
+                anchor.next('ul').prepend($('<li>').append(backLink));
               }
             }
           }
         });
       }
     }, {
-      key: "_update",
+      key: '_update',
       value: function _update() {
-        this._anchors = this._menu.find("a");
+        this._anchors = this._menu.find('a');
         this._hasMenu = this._anchors.length > 0;
         this._setupEventHandlers();
         this._setupSubmenus();
@@ -414,22 +414,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   // Link control buttons with the API
 
 
-  $("body").on("click", ".slide-menu-control", function (e) {
+  $('body').on('click', '.slide-menu-control', function (e) {
     var menu = void 0;
-    var target = $(this).data("target");
+    var target = $(this).data('target');
 
-    if (!target || target === "this") {
-      menu = $(this).parents(".slide-menu:first");
+    if (!target || target === 'this') {
+      menu = $(this).parents('.slide-menu:first');
     } else {
-      menu = $("#" + target);
+      menu = $('#' + target);
     }
 
     if (!menu.length) return;
 
     var instance = menu.data(PLUGIN_NAME);
-    var action = $(this).data("action");
+    var action = $(this).data('action');
 
-    if (instance && typeof instance[action] === "function") {
+    if (instance && typeof instance[action] === 'function') {
       instance[action]();
     }
 
@@ -439,7 +439,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   // Register the jQuery plugin
   $.fn[PLUGIN_NAME] = function (options) {
     if (!$(this).length) {
-      console.warn("Slide Menu: Unable to find menu DOM element. Maybe a typo?");
+      console.warn('Slide Menu: Unable to find menu DOM element. Maybe a typo?');
       return;
     }
 
