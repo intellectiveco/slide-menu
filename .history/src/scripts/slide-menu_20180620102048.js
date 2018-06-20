@@ -164,11 +164,7 @@
                   $ul.find('.loading').remove('');
                   // on each retrieved menu item, add new li
                   response.forEach(function(menuItem) {
-                    $ul.append(
-                      '<li><a href="#" data-function="function">' +
-                        menuItem.id +
-                        '</a></li>'
-                    );
+                    $ul.append('<li><a href="#" data-function="function">' + menuItem.id + '</a></li>');
                   });
                   anchor.data('function', undefined);
                   this._update();
