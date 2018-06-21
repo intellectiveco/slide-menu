@@ -20,8 +20,6 @@
   class SlideMenu {
     constructor(options) {
       this.options = options;
-      console.log('OPTIONS', options);
-
       this._menu = options.elem; // the left and right nav menu elements
       // Add wrapper
       this._menu.find('ul:first').wrap('<div class="slider">'); // wraps div with class slider around every ul that is the first child of its parent
@@ -142,13 +140,15 @@
       // if the clicked anchor has data function attribute, remove loading ul/li
       // debugger;
       var that = this;
-      console.log('OPTIONS INSIDE', this.options);
       if (this._isAnchorDynamic(anchor)) {
         // do ajax call
         var $ul = anchor.next('ul');
         if ($ul.find('.loading').length) {
-          
+
           var fetching = this.options.dynamicSourceFetchFunction.call(this, anchor.data(this.options.dynamicSourceDataAttribute));
+
+          anchor.removeData(that.options.dynamicSourceDataAttribute);
+
           fetching.then(function(list){
             list.forEach(function (a) {
               var $li = $('<li/>');
@@ -163,7 +163,6 @@
               $ul.append($li);
             });
             $ul.find('.loading').remove();
-            anchor.removeData(that.options.dynamicSourceDataAttribute);
             that._update();
           });
         }
@@ -175,20 +174,23 @@
      * @private
      */
     _setupEventHandlers() {
-      var that = this;
       // if there's at least one anchor
       if (this._hasMenu) {
         // bind a click event handler to all of the anchors
-        this._anchors.click(event => {
-          // if the clicked element is an anchor tag, assign it to the anchor variable
-          // else search up through the target element's ancestors for matched anchor tags that are the first child of their parent and assign it to the anchor variable
-          let anchor = $(event.target).is('a')
-            ? $(event.target)
-            : $(event.target).parents('a:first');
+        this._anchors.each((i, a) => {
+          a = $(a);
+          if(!a.data('events-processed')){
+            a.data('events-processed', true);
+            a.click(event => {
+              let anchor = $(event.target).is('a')
+                ? $(event.target)
+                : $(event.target).parents('a:first');
 
-          this._fetchDynamicItems(anchor);
-          // call navigate to slide the menu one step right
-          this._navigate(anchor);
+              this._fetchDynamicItems(anchor);
+              // call navigate to slide the menu one step right
+              this._navigate(anchor);
+            });
+          }
         });
       }
 
@@ -349,7 +351,7 @@
         // anchor click bind event handler
         // inject ul
         // if anchor has data-processed attribute set to false, set it to true
-        if (anchor.data('processed') === undefined) {
+        if (anchor.data('submenu-processed') === undefined) {
 
           //process the anchor to see if it has dynamic source for its submenu
           this._processDynamicAnchor(anchor);
@@ -362,7 +364,7 @@
             });
 
             // add `before` and `after` text
-            let anchorTitle = anchor.text();
+            let anchorTitle = anchor.html();
             anchor.html(
               this.options.submenuLinkBefore +
               anchorTitle +
@@ -376,16 +378,17 @@
                 anchorTitle +
                 '</a>'
               );
+
               backLink.html(
                 this.options.backLinkBefore +
-                backLink.text() +
+                backLink.html() +
                 this.options.backLinkAfter
               );
               anchor.next('ul').prepend($('<li>').append(backLink));
             }
           }
           //mark this anchor as processed so it doesn't get set again on update
-          anchor.data('processed', true);
+          anchor.data('submenu-processed', true);
         }
       });
     }
