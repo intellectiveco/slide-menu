@@ -323,6 +323,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function _navigate(anchor) {
         var dir = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
+
         this._menu.scrollTop(0);
 
         // console.log('NAVIGATING', anchor, dir);
@@ -335,9 +336,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         if (dir > 0) {
           if (!anchor.next('ul').length) {
-            this.close();
+            if (!anchor.is('.slide-menu-control')) this.close();
             return;
-          };
+          }
 
           anchor.next('ul').addClass('active').show();
         } else if (this._level === 0) {

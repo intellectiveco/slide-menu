@@ -282,6 +282,7 @@
      * @private
      */
     _navigate(anchor, dir = 1) {
+
       this._menu.scrollTop(0);
 
       // console.log('NAVIGATING', anchor, dir);
@@ -294,9 +295,10 @@
 
       if (dir > 0) {
         if (!anchor.next('ul').length) {
-          this.close();
+          if(!anchor.is('.slide-menu-control'))
+            this.close();
           return;
-        };
+        }
 
         anchor
           .next('ul')
