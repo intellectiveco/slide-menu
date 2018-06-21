@@ -177,6 +177,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         });
       }
     }, {
+      key: '_createMenuFromItems',
+      value: function _createMenuFromItems(items) {
+        var that = this;
+        var $ul = $('<ul/>');
+        items.forEach(function (item) {
+          $ul.append(that._createMenuItemFromObj(item));
+        });
+        return $ul;
+      }
+    }, {
+      key: '_createMenuItemFromObj',
+      value: function _createMenuItemFromObj(a) {
+        var that = this;
+        var $li = $('<li/>');
+        var $a = $('<a/>').attr({
+          href: a.href,
+          title: a.title
+        }).text(a.title);
+        if (a[that.options.dynamicSourceDataAttribute]) {
+          $a.data(that.options.dynamicSourceDataAttribute, a[that.options.dynamicSourceDataAttribute]);
+        }
+        $li.append($a);
+        if (a.items && a.items.length) {
+          $li.append(that._createMenuFromItems(a.items));
+        }
+        return $li;
+      }
+    }, {
       key: '_isAnchorDynamic',
       value: function _isAnchorDynamic(anchor) {
         return anchor.data(this.options.dynamicSourceDataAttribute) !== undefined && this.options.dynamicSourceFetchFunction != null;
@@ -185,29 +213,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: '_fetchDynamicItems',
       value: function _fetchDynamicItems(anchor) {
         // if the clicked anchor has data function attribute, remove loading ul/li
-        // debugger;
-        var that = this;
-        if (this._isAnchorDynamic(anchor)) {
+        var that = this,
+            fetched_attr = 'source-fetched';
+        if (this._isAnchorDynamic(anchor) && !anchor.data(fetched_attr)) {
           // do ajax call
           var $ul = anchor.next('ul');
           if ($ul.find('.loading').length) {
-
             var fetching = this.options.dynamicSourceFetchFunction.call(this, anchor.data(this.options.dynamicSourceDataAttribute));
-
             anchor.removeData(that.options.dynamicSourceDataAttribute);
-
+            anchor.data(fetched_attr, true);
             fetching.then(function (list) {
               list.forEach(function (a) {
-                var $li = $('<li/>');
-                var $a = $('<a/>').attr({
-                  href: a.href,
-                  title: a.title
-                }).text(a.title);
-                if (a[that.options.dynamicSourceDataAttribute]) {
-                  $a.data(that.options.dynamicSourceDataAttribute, a[that.options.dynamicSourceDataAttribute]);
-                };
-                $li.append($a);
-                $ul.append($li);
+                $ul.append(that._createMenuItemFromObj(a));
               });
               $ul.find('.loading').remove();
               that._update();
@@ -317,7 +334,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var offset = (this._level + dir) * -100;
 
         if (dir > 0) {
-          if (!anchor.next('ul').length) return;
+          if (!anchor.next('ul').length) {
+            this.close();
+            return;
+          };
 
           anchor.next('ul').addClass('active').show();
         } else if (this._level === 0) {
