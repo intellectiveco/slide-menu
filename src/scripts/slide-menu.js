@@ -12,6 +12,7 @@
     submenuLinkAfter: '',
     backLinkBefore: '',
     backLinkAfter: '',
+    showOverlay: true,
     dynamicSourceFetchFunction: null,
     dynamicSourceDataAttribute: 'source',
     dynamicLoadingContent: 'Loading...'
@@ -46,6 +47,17 @@
       this._setupMenu(); // set up which side menus are going to be on
 
       if (this._hasMenu) this._setupSubmenus(); //
+      this._appendOverlay();
+    }
+
+    _appendOverlay(){
+      this._overlay = $('<div class="slide-menu-overlay"></div>');
+      if(this.options.showOverlay) {
+        this._overlay.hide().click(event => {
+          this.close();
+        });
+        this._menu.before(this._overlay);
+      }
     }
 
     /**
@@ -89,6 +101,7 @@
     open(animate = true) {
       this._lastAction = 'open';
       this.toggle(true, animate);
+      this._overlay.fadeIn('fast');
     }
 
     /**
@@ -98,6 +111,7 @@
     close(animate = true) {
       this._lastAction = 'close';
       this.toggle(false, animate);
+      this._overlay.fadeOut('fast');
     }
 
     /**

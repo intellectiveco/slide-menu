@@ -18,6 +18,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     submenuLinkAfter: '',
     backLinkBefore: '',
     backLinkAfter: '',
+    showOverlay: true,
     dynamicSourceFetchFunction: null,
     dynamicSourceDataAttribute: 'source',
     dynamicLoadingContent: 'Loading...'
@@ -54,16 +55,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       this._setupMenu(); // set up which side menus are going to be on
 
       if (this._hasMenu) this._setupSubmenus(); //
+      this._appendOverlay();
     }
 
-    /**
-     * Toggle the menu
-     * @param {boolean|null} open
-     * @param {boolean} animate
-     */
-
-
     _createClass(SlideMenu, [{
+      key: '_appendOverlay',
+      value: function _appendOverlay() {
+        var _this = this;
+
+        this._overlay = $('<div class="slide-menu-overlay"></div>');
+        if (this.options.showOverlay) {
+          this._overlay.hide().click(function (event) {
+            _this.close();
+          });
+          this._menu.before(this._overlay);
+        }
+      }
+
+      /**
+       * Toggle the menu
+       * @param {boolean|null} open
+       * @param {boolean} animate
+       */
+
+    }, {
       key: 'toggle',
       value: function toggle() {
         var open = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -106,6 +121,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         this._lastAction = 'open';
         this.toggle(true, animate);
+        this._overlay.fadeIn('fast');
       }
 
       /**
@@ -120,6 +136,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         this._lastAction = 'close';
         this.toggle(false, animate);
+        this._overlay.fadeOut('fast');
       }
 
       /**
@@ -141,7 +158,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'navigateTo',
       value: function navigateTo(target) {
-        var _this = this;
+        var _this2 = this;
 
         target = this._menu.find($(target)).first();
 
@@ -153,9 +170,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         if (level === 0) return false;
 
         this._pauseAnimations(function () {
-          _this._level = level;
+          _this2._level = level;
           parents.show().first().addClass('active');
-          _this._triggerAnimation(_this._slider, -_this._level * 100);
+          _this2._triggerAnimation(_this2._slider, -_this2._level * 100);
         });
       }
     }, {
@@ -206,7 +223,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: '_setupEventHandlers',
       value: function _setupEventHandlers() {
-        var _this2 = this;
+        var _this3 = this;
 
         // if there's at least one anchor
         if (this._hasMenu) {
@@ -218,9 +235,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               a.click(function (event) {
                 var anchor = $(event.target).is('a') ? $(event.target) : $(event.target).parents('a:first');
 
-                _this2._fetchDynamicItems(anchor);
+                _this3._fetchDynamicItems(anchor);
                 // call navigate to slide the menu one step right
-                _this2._navigate(anchor);
+                _this3._navigate(anchor);
               });
             }
           });
@@ -233,19 +250,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         // select both this._menu and this._slider and add an event listener that listens for transitionend event
         $(this._menu.add(this._slider)).on('transitionend msTransitionEnd', function () {
           // when the listener events are triggered, set this._isAnimating to false
-          _this2._isAnimating = false;
+          _this3._isAnimating = false;
           //
-          _this2._triggerEvent(true);
+          _this3._triggerEvent(true);
         });
 
         $(document).keydown(function (e) {
           switch (e.which) {
-            case _this2.options.keycodeClose:
-              _this2.close();
+            case _this3.options.keycodeClose:
+              _this3.close();
               break;
 
-            case _this2.options.keycodeOpen:
-              _this2.open();
+            case _this3.options.keycodeOpen:
+              _this3.open();
               break;
 
             default:
@@ -255,8 +272,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         });
 
         this._menu.on('sm.back-after', function () {
-          var lastActiveUl = 'ul ' + '.active '.repeat(_this2._level + 1);
-          _this2._menu.find(lastActiveUl).removeClass('active').hide();
+          var lastActiveUl = 'ul ' + '.active '.repeat(_this3._level + 1);
+          _this3._menu.find(lastActiveUl).removeClass('active').hide();
         });
       }
 
@@ -336,25 +353,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: '_setupMenu',
       value: function _setupMenu() {
-        var _this3 = this;
+        var _this4 = this;
 
         this._pauseAnimations(function () {
-          switch (_this3.options.position) {
+          switch (_this4.options.position) {
             case 'left':
-              _this3._menu.css({
+              _this4._menu.css({
                 left: 0,
                 right: 'auto',
                 transform: 'translateX(-100%)'
               });
               break;
             default:
-              _this3._menu.css({
+              _this4._menu.css({
                 left: 'auto',
                 right: 0
               });
               break;
           }
-          _this3._menu.show();
+          _this4._menu.show();
         });
       }
 
@@ -392,7 +409,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: '_setupSubmenus',
       value: function _setupSubmenus() {
-        var _this4 = this;
+        var _this5 = this;
 
         this._anchors.each(function (i, anchor) {
           anchor = $(anchor);
@@ -404,7 +421,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (anchor.data('submenu-processed') === undefined) {
 
             //process the anchor to see if it has dynamic source for its submenu
-            _this4._processDynamicAnchor(anchor);
+            _this5._processDynamicAnchor(anchor);
 
             // check if there's a ul sibling next to anchor
             if (anchor.next('ul').length) {
@@ -415,13 +432,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
               // add `before` and `after` text
               var anchorTitle = anchor.html();
-              anchor.html(_this4.options.submenuLinkBefore + anchorTitle + _this4.options.submenuLinkAfter);
+              anchor.html(_this5.options.submenuLinkBefore + anchorTitle + _this5.options.submenuLinkAfter);
 
               // add a back button
-              if (_this4.options.showBackLink) {
+              if (_this5.options.showBackLink) {
                 var backLink = $('<a href class="slide-menu-control" data-action="back">' + anchorTitle + '</a>');
 
-                backLink.html(_this4.options.backLinkBefore + backLink.html() + _this4.options.backLinkAfter);
+                backLink.html(_this5.options.backLinkBefore + backLink.html() + _this5.options.backLinkAfter);
                 anchor.next('ul').prepend($('<li>').append(backLink));
               }
             }

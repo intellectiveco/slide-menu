@@ -13,6 +13,15 @@ $sm-transition-easing: ease-in-out !default;
 	list-style: none;
 }
 
+.slide-menu-overlay{
+  position: fixed;
+  top:0;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 9998;
+}
+
 .slide-menu {
 	position: fixed;
 	width: $sm-menu-width;
@@ -22,12 +31,13 @@ $sm-transition-easing: ease-in-out !default;
 	right: 0;
 	display: none;
 	overflow: hidden;
+  overflow-y: auto;
 	box-sizing: border-box;
 	background: $sm-menu-bg;
 	transition: transform $sm-transition-dur $sm-transition-easing;
 	transform: translateX(100%);
 	will-change: transform;
-	z-index: 1000;
+	z-index: 9999;
 
 	.slider {
 		position: absolute;
