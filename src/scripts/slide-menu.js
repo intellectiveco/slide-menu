@@ -100,6 +100,7 @@
      */
     open(animate = true) {
       this._lastAction = 'open';
+      this._menu.scrollTop(0);
       this.toggle(true, animate);
       this._overlay.fadeIn('fast');
     }
@@ -266,6 +267,8 @@
      * @private
      */
     _navigate(anchor, dir = 1) {
+      this._menu.scrollTop(0);
+
       // console.log('NAVIGATING', anchor, dir);
       // Abort if an animation is still running
       if (this._isAnimating) {

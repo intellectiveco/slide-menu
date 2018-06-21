@@ -120,6 +120,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var animate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
         this._lastAction = 'open';
+        this._menu.scrollTop(0);
         this.toggle(true, animate);
         this._overlay.fadeIn('fast');
       }
@@ -304,6 +305,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: '_navigate',
       value: function _navigate(anchor) {
         var dir = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+        this._menu.scrollTop(0);
 
         // console.log('NAVIGATING', anchor, dir);
         // Abort if an animation is still running

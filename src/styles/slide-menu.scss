@@ -39,6 +39,15 @@ $sm-transition-easing: ease-in-out !default;
 	will-change: transform;
 	z-index: 9999;
 
+  &::-webkit-scrollbar {
+    width: 0px;  /* remove scrollbar space */
+    background: transparent;  /* optional: just make scrollbar invisible */
+  }
+  /* optional: show position indicator in red */
+  &::-webkit-scrollbar-thumb {
+    background: #eee;
+  }
+
 	.slider {
 		position: absolute;
 		top: 0;
