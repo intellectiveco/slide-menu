@@ -342,7 +342,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               _this4._level = 0;
               _this4._triggerAnimation(_this4._slider, 0);
             });
-            debugger;
             this.close(true);
             return;
           }
