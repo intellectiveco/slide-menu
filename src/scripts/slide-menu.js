@@ -50,9 +50,9 @@
       this._appendOverlay();
     }
 
-    _appendOverlay(){
+    _appendOverlay() {
       this._overlay = $('<div class="slide-menu-overlay"></div>');
-      if(this.options.showOverlay) {
+      if (this.options.showOverlay) {
         this._overlay.hide().click(event => {
           this.close();
         });
@@ -147,33 +147,33 @@
       });
     }
 
-    _createMenuFromItems(items){
+    _createMenuFromItems(items) {
       var that = this;
       var $ul = $('<ul/>');
-      items.forEach(function(item){
+      items.forEach(function (item) {
         $ul.append(that._createMenuItemFromObj(item));
       });
       return $ul;
     }
 
-    _createMenuItemFromObj(a){
+    _createMenuItemFromObj(a) {
       var that = this;
       var $li = $('<li/>');
       var $a = $('<a/>').attr({
         href: a.href,
         title: a.title
       }).text(a.title);
-      if(a[that.options.dynamicSourceDataAttribute]){
+      if (a[that.options.dynamicSourceDataAttribute]) {
         $a.data(that.options.dynamicSourceDataAttribute, a[that.options.dynamicSourceDataAttribute]);
       }
       $li.append($a);
-      if(a.items && a.items.length){
+      if (a.items && a.items.length) {
         $li.append(that._createMenuFromItems(a.items));
       }
       return $li;
     }
 
-    _isAnchorDynamic(anchor){
+    _isAnchorDynamic(anchor) {
       return anchor.data(this.options.dynamicSourceDataAttribute) !== undefined && this.options.dynamicSourceFetchFunction != null;
     }
 
@@ -188,7 +188,7 @@
           var fetching = this.options.dynamicSourceFetchFunction.call(this, anchor.data(this.options.dynamicSourceDataAttribute));
           anchor.removeData(that.options.dynamicSourceDataAttribute);
           anchor.data(fetched_attr, true);
-          fetching.then(function(list){
+          fetching.then(function (list) {
             list.forEach(function (a) {
               $ul.append(that._createMenuItemFromObj(a));
             });
@@ -209,7 +209,7 @@
         // bind a click event handler to all of the anchors
         this._anchors.each((i, a) => {
           a = $(a);
-          if(!a.data('events-processed')){
+          if (!a.data('events-processed')) {
             a.data('events-processed', true);
             a.click(event => {
               let anchor = $(event.target).is('a')
@@ -295,12 +295,13 @@
 
       if (dir > 0) {
         if (!anchor.next('ul').length) {
-          if(!anchor.is('.slide-menu-control'))
+          if (!anchor.is('.slide-menu-control')) {
             this._pauseAnimations(() => {
               this._level = 0
               this._triggerAnimation(this._slider, 0);
             });
             this.close(true);
+          }
           return;
         }
 
@@ -370,7 +371,7 @@
       this._menu.removeClass('no-transition');
     }
 
-    _processDynamicAnchor(anchor){
+    _processDynamicAnchor(anchor) {
       if (this._isAnchorDynamic(anchor)) {
         // add sibling ul with child loading li
         //let's make the ul to store dynamic links

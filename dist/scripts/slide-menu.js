@@ -338,11 +338,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         if (dir > 0) {
           if (!anchor.next('ul').length) {
-            if (!anchor.is('.slide-menu-control')) this._pauseAnimations(function () {
-              _this4._level = 0;
-              _this4._triggerAnimation(_this4._slider, 0);
-            });
-            this.close(true);
+            if (!anchor.is('.slide-menu-control')) {
+              this._pauseAnimations(function () {
+                _this4._level = 0;
+                _this4._triggerAnimation(_this4._slider, 0);
+              });
+              this.close(true);
+            }
             return;
           }
 
