@@ -296,7 +296,11 @@
       if (dir > 0) {
         if (!anchor.next('ul').length) {
           if(!anchor.is('.slide-menu-control'))
-            this.close();
+            this._pauseAnimations(() => {
+              this._level = 0
+              this._triggerAnimation(this._slider, 0);
+            });
+            this.close(true);
           return;
         }
 

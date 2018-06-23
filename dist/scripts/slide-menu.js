@@ -321,6 +321,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: '_navigate',
       value: function _navigate(anchor) {
+        var _this4 = this;
+
         var dir = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
 
@@ -336,7 +338,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         if (dir > 0) {
           if (!anchor.next('ul').length) {
-            if (!anchor.is('.slide-menu-control')) this.close();
+            if (!anchor.is('.slide-menu-control')) this._pauseAnimations(function () {
+              _this4._level = 0;
+              _this4._triggerAnimation(_this4._slider, 0);
+            });
+            debugger;
+            this.close(true);
             return;
           }
 
@@ -377,25 +384,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: '_setupMenu',
       value: function _setupMenu() {
-        var _this4 = this;
+        var _this5 = this;
 
         this._pauseAnimations(function () {
-          switch (_this4.options.position) {
+          switch (_this5.options.position) {
             case 'left':
-              _this4._menu.css({
+              _this5._menu.css({
                 left: 0,
                 right: 'auto',
                 transform: 'translateX(-100%)'
               });
               break;
             default:
-              _this4._menu.css({
+              _this5._menu.css({
                 left: 'auto',
                 right: 0
               });
               break;
           }
-          _this4._menu.show();
+          _this5._menu.show();
         });
       }
 
@@ -433,7 +440,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: '_setupSubmenus',
       value: function _setupSubmenus() {
-        var _this5 = this;
+        var _this6 = this;
 
         this._anchors.each(function (i, anchor) {
           anchor = $(anchor);
@@ -445,7 +452,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (anchor.data('submenu-processed') === undefined) {
 
             //process the anchor to see if it has dynamic source for its submenu
-            _this5._processDynamicAnchor(anchor);
+            _this6._processDynamicAnchor(anchor);
 
             // check if there's a ul sibling next to anchor
             if (anchor.next('ul').length) {
@@ -456,13 +463,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
               // add `before` and `after` text
               var anchorTitle = anchor.html();
-              anchor.html(_this5.options.submenuLinkBefore + anchorTitle + _this5.options.submenuLinkAfter);
+              anchor.html(_this6.options.submenuLinkBefore + anchorTitle + _this6.options.submenuLinkAfter);
 
               // add a back button
-              if (_this5.options.showBackLink) {
+              if (_this6.options.showBackLink) {
                 var backLink = $('<a href class="slide-menu-control" data-action="back">' + anchorTitle + '</a>');
 
-                backLink.html(_this5.options.backLinkBefore + backLink.html() + _this5.options.backLinkAfter);
+                backLink.html(_this6.options.backLinkBefore + backLink.html() + _this6.options.backLinkAfter);
                 anchor.next('ul').prepend($('<li>').append(backLink));
               }
             }
