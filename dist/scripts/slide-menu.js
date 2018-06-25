@@ -65,7 +65,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         this._overlay = $('<div class="slide-menu-overlay"></div>');
         if (this.options.showOverlay) {
-          this._overlay.hide().click(function (event) {
+          this._overlay.hide().click(function () {
             _this.close();
           });
           this._menu.before(this._overlay);
@@ -96,9 +96,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         } else if (open) {
           offset = 0;
           this._isOpen = true;
+          this._menu.scrollTop(0);
+          this._overlay.fadeIn('fast');
         } else {
           offset = this.options.position === 'left' ? '-100%' : '100%';
           this._isOpen = false;
+          this._overlay.fadeOut('fast');
         }
 
         this._triggerEvent();
@@ -495,7 +498,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   // Link control buttons with the API
 
 
-  $('body').on('click', '.slide-menu-control', function (e) {
+  $('body').on('click', '.slide-menu-control', function () {
     var menu = void 0;
     var target = $(this).data('target');
 

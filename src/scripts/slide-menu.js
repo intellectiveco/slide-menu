@@ -53,7 +53,7 @@
     _appendOverlay() {
       this._overlay = $('<div class="slide-menu-overlay"></div>');
       if (this.options.showOverlay) {
-        this._overlay.hide().click(event => {
+        this._overlay.hide().click(() => {
           this.close();
         });
         this._menu.before(this._overlay);
@@ -78,9 +78,12 @@
       } else if (open) {
         offset = 0;
         this._isOpen = true;
+        this._menu.scrollTop(0);
+        this._overlay.fadeIn('fast');
       } else {
         offset = this.options.position === 'left' ? '-100%' : '100%';
         this._isOpen = false;
+        this._overlay.fadeOut('fast');
       }
 
       this._triggerEvent();
@@ -297,7 +300,7 @@
         if (!anchor.next('ul').length) {
           if (!anchor.is('.slide-menu-control')) {
             this._pauseAnimations(() => {
-              this._level = 0
+              this._level = 0;
               this._triggerAnimation(this._slider, 0);
             });
             this.close(true);
@@ -444,7 +447,7 @@
   }
 
   // Link control buttons with the API
-  $('body').on('click', '.slide-menu-control', function (e) {
+  $('body').on('click', '.slide-menu-control', function () {
     let menu;
     let target = $(this).data('target');
 
