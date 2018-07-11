@@ -299,10 +299,18 @@
       if (dir > 0) {
         if (!anchor.next('ul').length) {
           if (!anchor.is('.slide-menu-control')) {
-            this._pauseAnimations(() => {
-              this._level = 0;
-              this._triggerAnimation(this._slider, 0);
-            });
+              this._pauseAnimations(() => {
+                while(this._level > 0) {
+                  //close all levels
+                  this._level -= 1;
+                  this._triggerAnimation(this._slider, this._level * -100);
+                  //hide the ul
+                  anchor
+                    .closest('ul.active')
+                    .removeClass('active')
+                    .hide();
+                }
+              });
             this.close(true);
           }
           return;

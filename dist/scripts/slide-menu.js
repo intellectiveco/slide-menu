@@ -343,8 +343,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (!anchor.next('ul').length) {
             if (!anchor.is('.slide-menu-control')) {
               this._pauseAnimations(function () {
-                _this4._level = 0;
-                _this4._triggerAnimation(_this4._slider, 0);
+                while (_this4._level > 0) {
+                  //close all levels
+                  _this4._level -= 1;
+                  _this4._triggerAnimation(_this4._slider, _this4._level * -100);
+                  //hide the ul
+                  anchor.closest('ul.active').removeClass('active').hide();
+                }
               });
               this.close(true);
             }
